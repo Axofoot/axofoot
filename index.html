@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXOFOOT | Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --axo-blue: #1a1a2e; --foot-green: #2ecc71; --axo-red: #e74c3c; --light-bg: #f4f7f6; }
+        body { background-color: var(--light-bg); font-family: 'Poppins', sans-serif; color: #333; }
+        
+        /* HEADER & NAV (IDENTIQUE SUR TOUTES LES PAGES) */
+        .header-brand { background: var(--axo-blue); color: white; padding: 15px 0; border-bottom: 4px solid var(--foot-green); }
+        .header-container { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .main-logo { width: 60px; height: auto; }
+        .logo-axo { font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; line-height: 1; }
+        .nav-axo { background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .nav-link { color: var(--axo-blue); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 3px solid transparent; }
+        .nav-link.active { color: var(--foot-green); border-bottom: 3px solid var(--foot-green); }
+
+        .section-title { font-weight: 800; text-transform: uppercase; font-size: 0.9rem; color: var(--axo-blue); margin-bottom: 15px; display: flex; align-items: center; }
+        .section-title::after { content: ''; height: 2px; flex-grow: 1; background: #ddd; margin-left: 10px; }
+
+        /* LIVE */
+        .live-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--axo-red); }
+        .match-live-row { display: flex; align-items: center; justify-content: space-between; }
+        .m-team-live { width: 35%; font-weight: 700; font-size: 0.85rem; }
+        .m-score-box { width: 25%; text-align: center; background: var(--axo-blue); color: white; border-radius: 8px; padding: 5px; font-weight: 900; }
+        .badge-live { background: var(--axo-red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* GRILLE ACTUS */
+        .news-card { display: block; position: relative; height: 220px; border-radius: 12px; overflow: hidden; text-decoration: none !important; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s; margin-bottom: 10px; }
+        .news-card:hover { transform: translateY(-5px); }
+        .news-card-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; }
+        .news-card:hover .news-card-img { transform: scale(1.1); }
+        .news-card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: linear-gradient(transparent, rgba(26, 26, 46, 0.9)); color: white; }
+        .badge-cat { background: var(--foot-green); font-size: 0.6rem; padding: 3px 8px; border-radius: 4px; font-weight: 900; margin-bottom: 5px; display: inline-block; }
+        .news-card-title { font-size: 0.95rem; font-weight: 700; margin: 0; line-height: 1.2; color: white; }
+        .btn-journal-dark { background: var(--axo-blue); color: white !important; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<header class="header-brand">
+    <div class="container header-container">
+        <img src="https://i.ibb.co/d07fM3pm/Sans-titre-2.png" class="main-logo">
+        <div class="logo-text">
+            <div class="logo-axo">AXO<span style="color:var(--foot-green)">FOOT</span></div>
+            <p class="mb-0 small opacity-75" style="font-size: 0.7rem;">Le foot amateur dans l'Aisne</p>
+        </div>
+    </div>
+</header>
+
+<nav class="nav-axo">
+    <div class="container d-flex justify-content-center">
+        <a class="nav-link p-3 active" href="index.html">Accueil</a>
+        <a class="nav-link p-3" href="classement.html">Classements</a>
+        <a class="nav-link p-3" href="buteurs.html">Buteurs</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <h2 class="section-title">En Direct <span class="badge-live ms-2">LIVE</span></h2>
+            <div id="live-container">
+                <div class="text-center p-4 text-muted small">Chargement du direct...</div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h2 class="section-title">Actualités AXOFOOT</h2>
+            <div id="news-grid" class="row g-3">
+                <div class="text-center p-5">Chargement des actus...</div>
+            </div>
+            <div class="text-center mt-4 mb-5">
+                <a href="journal.html" class="btn-journal-dark">📖 Accéder au Journal Complet</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SHEET_ID = '1MxTbV8PA4wOmtSC1ze01nZLgNxTI6KgYjhaEEg6i5Fo';
+
+    async function fetchLive() {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Resultats`;
+            const res = await fetch(url);
+            const text = await res.text();
+            const rows = text.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim()));
+            const liveMatches = rows.slice(1).filter(m => m[6] === "En cours");
+            let html = '';
+            if(liveMatches.length > 0) {
+                liveMatches.forEach(m => {
+                    html += `<div class="live-card"><div class="text-muted small mb-2">${m[7]}</div><div class="match-live-row"><div class="m-team-live text-end">${m[2]}</div><div class="m-score-box">${m[3]} - ${m[5]}</div><div class="m-team-live text-start">${m[4]}</div></div></div>`;
+                });
+            } else { html = '<div class="text-center p-4 text-muted small border bg-white rounded">Aucun direct.</div>'; }
+            document.getElementById('live-container').innerHTML = html;
+        } catch (e) { console.error(e); }
+    }
+
+    async function fetchActus() {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Actus`;
+            const res = await fetch(url);
+            const text = await res.text();
+            const rows = text.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim()));
+            let html = '';
+            const actus = rows.slice(1, 5); 
+            actus.forEach(a => {
+                if(a[0]) { 
+                    // On ajoute le # avant l'ID du signet
+                    html += `<div class="col-md-6"><a href="journal.html#${a[3]}" class="news-card"><div class="news-card-img" style="background-image: url('${a[1]}');"></div><div class="news-card-overlay"><span class="badge-cat">${a[2]}</span><h3 class="news-card-title">${a[0]}</h3></div></a></div>`;
+                }
+            });
+            document.getElementById('news-grid').innerHTML = html;
+        } catch (e) { console.error(e); }
+    }
+
+    fetchLive();
+    fetchActus();
+    setInterval(fetchLive, 60000);
+</script>
+</body>
+</html>

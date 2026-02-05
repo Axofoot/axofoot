@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXOFOOT | Classements & Calendrier</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --axo-blue: #1a1a2e; --foot-green: #2ecc71; --axo-red: #e74c3c; --light-bg: #f4f7f6; }
+        body { background-color: var(--light-bg); font-family: 'Poppins', sans-serif; color: #333; }
+        
+        /* Header */
+        .header-brand { background: var(--axo-blue); color: white; padding: 15px 0; border-bottom: 4px solid var(--foot-green); }
+        .header-container { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .main-logo { width: 60px; height: auto; }
+        .logo-axo { font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; line-height: 1; }
+
+        /* Navigation */
+        .nav-axo { background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .nav-link { color: var(--axo-blue); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 3px solid transparent; }
+        .nav-link.active { color: var(--foot-green); border-bottom: 3px solid var(--foot-green); }
+
+        /* Sélecteur de Poule */
+        .selector-container { background: white; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border-radius: 10px; }
+        .form-select-axo { max-width: 400px; margin: 0 auto; border: 2px solid var(--axo-blue); font-weight: 700; border-radius: 8px; }
+
+        /* Sections & Cards */
+        .section-title { font-weight: 800; text-transform: uppercase; font-size: 0.9rem; color: var(--axo-blue); margin-bottom: 15px; display: flex; align-items: center; }
+        .section-title::after { content: ''; height: 2px; flex-grow: 1; background: #ddd; margin-left: 10px; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; overflow: hidden; background: white; }
+        .cat-title { background: #f8f9fa; padding: 10px 15px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #666; }
+
+        /* Matchs & Logos */
+        .logo-club { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+        .match-item { display: flex; align-items: center; padding: 10px 5px; border-bottom: 1px solid #eee; font-size: 0.78rem; }
+        .m-team { width: 40%; font-weight: 700; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .m-team.text-end { justify-content: flex-end; }
+        .m-team.text-start { justify-content: flex-start; }
+        .m-score { width: 20%; text-align: center; font-weight: 900; background: var(--axo-blue); color: white; border-radius: 6px; padding: 3px 0; min-width: 60px; font-size: 0.8rem; margin: 0 5px; }
+        .m-status { font-size: 0.6rem; color: #aaa; display: block; font-weight: 400; }
+        .badge-live { background: var(--axo-red); color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.55rem; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* Zones promotion / relégation */
+        .row-promotion { background-color: rgba(46, 204, 113, 0.08) !important; border-left: 4px solid var(--foot-green); }
+        .row-relegation { background-color: rgba(231, 76, 60, 0.08) !important; border-left: 4px solid var(--axo-red); }
+        .table-responsive { font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<header class="header-brand">
+    <div class="container header-container">
+        <img src="https://i.ibb.co/d07fM3pm/Sans-titre-2.png" alt="AXOFOOT" class="main-logo">
+        <div class="logo-text">
+            <div class="logo-axo">AXO<span style="color:var(--foot-green)">FOOT</span></div>
+            <p class="mb-0 small opacity-75" style="font-size: 0.7rem;">Le foot amateur dans l'Aisne</p>
+        </div>
+    </div>
+</header>
+
+<nav class="nav-axo">
+    <div class="container d-flex justify-content-center">
+        <a class="nav-link p-3" href="index.html">Accueil</a>
+        <a class="nav-link p-3 active" href="classement.html">Classements</a>
+        <a class="nav-link p-3" href="buteurs.html">Buteurs</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="selector-container text-center">
+        <select class="form-select form-select-axo" id="pouleSelector" onchange="loadComp(this.value)">
+            <optgroup label="Départemental 1">
+                <option value="D1">D1</option>
+            </optgroup>
+            <optgroup label="Départemental 2">
+                <option value="D2A">D2 - Poule A</option>
+                <option value="D2B">D2 - Poule B</option>
+            </optgroup>
+            <optgroup label="Départemental 3">
+                <option value="D3A">D3 - Poule A</option>
+                <option value="D3B">D3 - Poule B</option>
+                <option value="D3C">D3 - Poule C</option>
+            </optgroup>
+            <optgroup label="Départemental 4">
+                <option value="D4A">D4 - Poule A</option>
+                <option value="D4B">D4 - Poule B</option>
+                <option value="D4C">D4 - Poule C</option>
+                <option value="D4D">D4 - Poule D</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5">
+            <h2 class="section-title">Calendrier</h2>
+            <div class="card" id="results-list">
+                <div class="p-5 text-center text-muted small">Sélectionnez une poule...</div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h2 class="section-title">Classement</h2>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 text-center">
+                        <thead class="small">
+                            <tr><th>Pos</th><th class="text-start">Équipe</th><th>Pts</th><th>MJ</th><th>V</th><th>N</th><th>D</th><th>Diff</th></tr>
+                        </thead>
+                        <tbody id="ranking-list" class="small"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SHEET_ID = '1MxTbV8PA4wOmtSC1ze01nZLgNxTI6KgYjhaEEg6i5Fo';
+    let clubLogos = {}; 
+
+    async function fetchData(sheetName) {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+            const res = await fetch(url);
+            const text = await res.text();
+            return text.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim()));
+        } catch (e) { return []; }
+    }
+
+    async function loadComp(pouleName) {
+        const today = new Date(); 
+        
+        // 1. Charger les logos
+        const logosData = await fetchData('Logos');
+        logosData.slice(1).forEach(r => { if(r[0]) clubLogos[r[0].trim()] = r[1]; });
+
+        // 2. Charger les classements
+        const rankData = await fetchData('Classements');
+        let rankHtml = '';
+        let filteredRanks = rankData.slice(1).filter(r => r[11] && r[11].trim() !== "" && r[20] && r[20].trim() === pouleName);
+        
+        filteredRanks.forEach((r, i) => {
+            const teamName = r[11].trim();
+            const logo = clubLogos[teamName] || 'https://cdn-icons-png.flaticon.com/512/33/33736.png';
+            
+            let rowClass = '';
+            if (i < 2) rowClass = 'row-promotion';
+            else if (i >= filteredRanks.length - 2) rowClass = 'row-relegation';
+
+            rankHtml += `<tr class="${rowClass}">
+                <td><strong>${i+1}</strong></td>
+                <td class="text-start"><img src="${logo}" class="logo-club"> <strong>${teamName}</strong></td>
+                <td class="fw-bold text-primary">${r[12]}</td><td>${r[13]}</td><td>${r[14]}</td><td>${r[15]}</td><td>${r[16]}</td><td>${r[19]}</td>
+            </tr>`;
+        });
+        document.getElementById('ranking-list').innerHTML = rankHtml || '<tr><td colspan="8" class="p-4">Données non disponibles pour cette poule</td></tr>';
+
+        // 3. Charger les résultats/calendrier
+        const resData = await fetchData('Resultats');
+        let resHtml = '';
+        let matches = resData.slice(1).filter(m => m[7] && m[7].trim() === pouleName).map(m => {
+            const p = m[1].split('/');
+            return { d: m, dateObj: new Date(p[2], p[1]-1, p[0]) };
+        });
+
+        if (matches.length > 0) {
+            const passés = matches.filter(m => m.dateObj < today).sort((a,b) => b.dateObj - a.dateObj).slice(0,6);
+            const àVenir = matches.filter(m => m.dateObj >= today).sort((a,b) => a.dateObj - b.dateObj).slice(0,6);
+
+            if(àVenir.length > 0) {
+                resHtml += '<div class="cat-title">🕒 Prochains Matchs</div>';
+                àVenir.forEach(obj => resHtml += renderMatch(obj.d));
+            }
+            if(passés.length > 0) {
+                resHtml += '<div class="cat-title">✅ Derniers Résultats</div>';
+                passés.forEach(obj => resHtml += renderMatch(obj.d));
+            }
+        }
+        document.getElementById('results-list').innerHTML = resHtml || '<p class="p-4 text-center">Aucun match programmé</p>';
+    }
+
+    function renderMatch(m) {
+        const team1 = m[2]?.trim();
+        const team2 = m[4]?.trim();
+        const logo1 = clubLogos[team1] || 'https://cdn-icons-png.flaticon.com/512/33/33736.png';
+        const logo2 = clubLogos[team2] || 'https://cdn-icons-png.flaticon.com/512/33/33736.png';
+        
+        const statut = m[6] ? m[6].trim() : "";
+        const isLive = statut === "En cours" ? '<span class="badge-live">DIRECT</span>' : m[1];
+        
+        let score = "VS";
+        if (["Terminé", "En cours", "Forfait", "Pénalité", "Arrêté"].includes(statut)) {
+            score = `${m[3]} - ${m[5]}`;
+        }
+        
+        return `
+        <div class="match-item">
+            <div class="m-team text-end">${team1} <img src="${logo1}" class="logo-club"></div>
+            <div class="m-score">${score} <span class="m-status">${isLive}</span></div>
+            <div class="m-team text-start"><img src="${logo2}" class="logo-club"> ${team2}</div>
+        </div>`;
+    }
+
+    // Chargement par défaut au lancement (D1)
+    window.onload = () => loadComp('D1');
+</script>
+
+</body>
+</html>

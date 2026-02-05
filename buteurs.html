@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXOFOOT | Meilleurs Buteurs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --axo-blue: #1a1a2e; --foot-green: #2ecc71; --light-bg: #f4f7f6; }
+        body { background-color: var(--light-bg); font-family: 'Poppins', sans-serif; color: #333; }
+        .header-brand { background: var(--axo-blue); color: white; padding: 15px 0; border-bottom: 4px solid var(--foot-green); }
+        .header-container { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .main-logo { width: 60px; height: auto; }
+        .logo-axo { font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; line-height: 1; }
+        .nav-axo { background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .nav-link { color: var(--axo-blue); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; border-bottom: 3px solid transparent; }
+        .nav-link.active { color: var(--foot-green); border-bottom: 3px solid var(--foot-green); }
+        
+        /* Podium & Table */
+        .podium-container { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 30px 0; }
+        .podium-item { background: white; border-radius: 12px 12px 0 0; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 30%; }
+        .rank-1 { height: 180px; border-top: 5px solid #ffd700; }
+        .rank-2 { height: 150px; border-top: 5px solid #c0c0c0; }
+        .rank-3 { height: 130px; border-top: 5px solid #cd7f32; }
+        .podium-logo { width: 40px; height: 40px; object-fit: contain; margin-bottom: 10px; }
+        .podium-goals { color: var(--foot-green); font-weight: 900; font-size: 1.5rem; display: block; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; background: white; }
+        .logo-club-small { width: 25px; height: 25px; object-fit: contain; margin-right: 8px; }
+    </style>
+</head>
+<body>
+<header class="header-brand">
+    <div class="container header-container">
+        <img src="https://i.ibb.co/d07fM3pm/Sans-titre-2.png" class="main-logo">
+        <div class="logo-text">
+            <div class="logo-axo">AXO<span style="color:var(--foot-green)">FOOT</span></div>
+            <p class="mb-0 small opacity-75" style="font-size: 0.7rem;">Le foot amateur dans l'Aisne</p>
+        </div>
+    </div>
+</header>
+<nav class="nav-axo">
+    <div class="container d-flex justify-content-center">
+        <a class="nav-link p-3" href="index.html">Accueil</a>
+        <a class="nav-link p-3" href="classement.html">Classements</a>
+        <a class="nav-link p-3 active" href="buteurs.html">Buteurs</a>
+    </div>
+</nav>
+<div class="container">
+    <div id="podium" class="podium-container"></div>
+    <div class="card">
+        <table class="table table-hover mb-0">
+            <thead class="table-light"><tr><th>Rang</th><th>Joueur</th><th>Club</th><th class="text-center">Buts</th></tr></thead>
+            <tbody id="buteurs-list"></tbody>
+        </table>
+    </div>
+</div>
+<script>
+    const SHEET_ID = '1MxTbV8PA4wOmtSC1ze01nZLgNxTI6KgYjhaEEg6i5Fo';
+    async function loadButeurs() {
+        const urlLogos = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Logos`;
+        const resL = await fetch(urlLogos); const textL = await resL.text();
+        let logos = {}; textL.split('\n').slice(1).forEach(r => { const c = r.split(','); logos[c[0].replace(/"/g,'').trim()] = c[1]?.replace(/"/g,''); });
+
+        const urlB = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Buteurs`;
+        const resB = await fetch(urlB); const textB = await resB.text();
+        const data = textB.split('\n').slice(1).map(r => {
+            const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/"/g,'').trim());
+            return { nom: c[0], club: c[1], buts: parseInt(c[2]) || 0 };
+        }).sort((a,b) => b.buts - a.buts);
+
+        // Podium
+        let podHtml = ''; const top3 = data.slice(0,3);
+        if(top3.length === 3) {
+            [top3[1], top3[0], top3[2]].forEach((b, i) => {
+                const r = i === 1 ? 'rank-1' : (i === 0 ? 'rank-2' : 'rank-3');
+                podHtml += `<div class="podium-item ${r}"><img src="${logos[b.club] || ''}" class="podium-logo"><div class="small fw-bold">${b.nom}</div><div class="podium-goals">${b.buts}</div></div>`;
+            });
+        }
+        document.getElementById('podium').innerHTML = podHtml;
+
+        // Liste
+        let listHtml = ''; data.slice(3).forEach((b, i) => {
+            listHtml += `<tr><td>${i+4}</td><td><strong>${b.nom}</strong></td><td><img src="${logos[b.club] || ''}" class="logo-club-small">${b.club}</td><td class="text-center fw-bold text-success">${b.buts}</td></tr>`;
+        });
+        document.getElementById('buteurs-list').innerHTML = listHtml;
+    }
+    loadButeurs();
+</script>
+</body>
+</html>
